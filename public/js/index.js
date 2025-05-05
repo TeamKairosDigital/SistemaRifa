@@ -111,7 +111,7 @@ function enviarWhatsApp() {
     const cantidadBoletos = Array.from(document.querySelectorAll(".number.selected")).length;
     const total = cantidadBoletos * 25;
 
-    const mensaje = `Hola, soy ${nombre}.\nQuiero participar en la Rifa: ${rifaSeleccionada}.\n- Mi número de WhatsApp es: ${telefono}.\n- Mis números seleccionados son: ${numeros}\n- El total a pagar es de: ${total} pesos`;
+    const mensaje = `Hola, soy ${nombre}.\n\nQuiero participar en la Rifa: ${rifaSeleccionada}.\n\n- Mi número de WhatsApp es: ${telefono}.\n\n- Mis números seleccionados son: ${numeros}\n\n- El total a pagar es de: $${total} pesos`;
 
     const url = `https://wa.me/+529611983460?text=${encodeURIComponent(mensaje)}`;
     window.open(url, "_blank");
@@ -175,4 +175,33 @@ document.querySelectorAll('.copy-icon').forEach(icon => {
           
     });
   });
+});
+
+
+
+simplyCountdown('#cuenta', {
+    year: 2025, // required
+    month: 5, // required
+    day: 30, // required
+    hours: 14, // Default is 0 [0-23] integer
+    minutes: 30, // Default is 0 [0-59] integer
+    seconds: 0, // Default is 0 [0-59] integer
+    words: { //words displayed into the countdown
+        days: { singular: 'Día', plural: 'Días' },
+        hours: { singular: 'Hrs', plural: 'Hrs' },
+        minutes: { singular: 'Min', plural: 'Min' },
+        seconds: { singular: 'Seg', plural: 'Seg' }
+    },
+    plural: true, //use plurals
+    inline: false, //set to true to get an inline basic countdown like : 24 days, 4 hours, 2 minutes, 5 seconds
+    inlineClass: 'simply-countdown-inline', //inline css span class in case of inline = true
+    // in case of inline set to false
+    enableUtc: false, //Use UTC or not - default : false
+    onEnd: function() { return; }, //Callback on countdown end, put your own function here
+    refresh: 1000, // default refresh every 1s
+    sectionClass: 'simply-section', //section css class
+    amountClass: 'simply-amount', // amount css class
+    wordClass: 'simply-word', // word css class
+    zeroPad: false,
+    countUp: false
 });
