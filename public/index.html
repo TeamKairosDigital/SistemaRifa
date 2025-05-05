@@ -3,38 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
     <title>Administración de Rifas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="img/icono.png">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
     <div class="w-100 w-md-50 w-lg-25">
 
+        <div class="text-center d-lg-flex justify-content-center">
+            <div class="w-100 w-md-50 w-lg-25 mb-3 mb-lg-0">
+                <img src="img/Rifa_1.png" alt="Rifa_1"
+                 class="w-100 mx-auto">
+            </div>
+            <div class="w-100 w-md-50 w-lg-25">
+                <img src="img/Rifa_2.png" alt="Rifa_2"
+                class="w-100 mx-auto">
+            </div>
+        </div>
+        
         <h4 for="rifaSelect" class="mt-5">Selecciona una rifa:</h4>
     
         <div class="d-flex justify-content-center">
-            <div class="mx-4 w-100">
+            <div class="mx-3 w-75">
                 <select class="form-select" id="rifaSelect" aria-label="Default select example">
-                    <option value="rifa1">Rifa 1: Power Bank</option>
-                    <option value="rifa2">Rifa 2: Set de Maquillaje</option>
-                    <option value="rifa3">Rifa 3: Diseño Gratis</option>
-                    <option value="rifa4">Rifa 4: Cena para 2 personas</option>
+                    <option value="rifa1">Rifa 1: Perfume de caballero</option>
+                    <option value="rifa2">Rifa 2: Collar de acero inoxidable</option>
+                    <!-- <option value="rifa3">Rifa 3: Diseño Gratis</option>
+                    <option value="rifa4">Rifa 4: Cena para 2 personas</option> -->
                 </select>
             </div>
         </div>
     
-        <div>
-            <div class="text-start" style="margin: 1rem 8%;">
+        <div style="margin: 1.2rem 8%;">
+            <div class="text-start">
                 <h4>Reglas:</h4>
                 <p>1. Selecciona la cantidad de números que deseas comprar.</p>
                 <p>2. Ingresa tu nombre y tu número de WhatsApp.</p>
                 <p>3. Haz clic en "Adquirir boleto(s)" para enviar un mensaje de WhatsApp con los números seleccionados.</p>
                 <p><strong>Nota:</strong> Es importante que envíes el comprobante de pago en captura o foto; de lo contrario, tu participación no será válida.</p>
+            </div>
+        </div>
+
+        <div class="tarjeta-contenedor">
+            <div class="tarjeta" id="tarjeta">
+              <!-- Frente -->
+              <div class="cara frente">
+                <div class="bbva">BBVA</div>
+                <div class="chip"></div>
+          
+                <div class="numero-tarjeta">
+                  <span id="numTarjeta">4152 3140 0966 4106</span>
+                  <i class="fa-regular fa-copy copy-icon" data-target="numTarjeta"></i>
+                </div>
+          
+                <div class="nombre-titular">
+                  <span id="nombreTitular">GUADALUPE RAMÍREZ JIMÉNEZ</span>
+                  <i class="fa-regular fa-copy copy-icon" data-target="nombreTitular"></i>
+                </div>
+              </div>
+          
+              <!-- Reverso -->
+              <div class="cara reverso">
+                <div class="dato-con-copia">
+                  <span><strong>Cuenta:</strong> <span id="cuenta">153 557 0293</span></span>
+                  <i class="fa-regular fa-copy copy-icon" data-target="cuenta"></i>
+                </div>
+                <div class="dato-con-copia">
+                  <span><strong>Cuenta CLABE:</strong> <span id="clabe"> 012 180 01535570293 0</span></span>
+                  <i class="fa-regular fa-copy copy-icon" data-target="clabe"></i>
+                </div>
+                <div class="bbva">BBVA</div>
+              </div>
             </div>
         </div>
     
@@ -57,15 +108,16 @@
     
         <!-- Inputs para Nombre y Número -->
         <div class="container my-4">
-            <label for="telefono" class="form-label">Nombre Completo:</label>
-            <input type="text" id="nombre" class="form-control mb-2" placeholder="Tu Nombre">
+            <label for="nombre" class="form-label">Nombre Completo:</label>
+            <input type="text" id="nombre" class="form-control mb-2" placeholder="Juan Perez">
             <label for="telefono" class="form-label">Número de Teléfono:</label>
-            <input type="text" id="telefono" class="form-control mb-2" placeholder="Número de WhatsApp">
+            <input type="text" id="telefono" class="form-control mb-2" placeholder="961 123 4567">
         </div>
     
         <div class="contenedor my-5">
             <button type="button" class="btn btn-primary" id="enviarBtn" disabled>Adquirir boleto(s)</button>
         </div>
+          
         
     </div>
 

@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "raffle-system",
     "public": "public",
     "ignore": [
       "firebase.json",

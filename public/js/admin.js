@@ -25,12 +25,12 @@ async function cargarRifa() {
     const docSnap = await getDoc(docRef);
     datos = docSnap.exists() ? docSnap.data() : {};
 
-    let cantidadNumeros = 100;
-        if(rifaSeleccionada == 'rifa4'){
-            cantidadNumeros = 50;
-        }else{
-            cantidadNumeros = 100;
-        }
+    let cantidadNumeros = 50;
+        // if(rifaSeleccionada == 'rifa4'){
+        //     cantidadNumeros = 50;
+        // }else{
+        //     cantidadNumeros = 100;
+        // }
     
     for (let i = 1; i <= cantidadNumeros; i++) {
         const number = document.createElement("div");
@@ -100,12 +100,12 @@ async function generarTablaRifa() {
                 <tbody>
         `;
 
-        let cantidadNumerosTabla = 100;
-        if(rifaSeleccionada == 'rifa4'){
-            cantidadNumerosTabla = 50;
-        }else{
-            cantidadNumerosTabla = 100;
-        }
+        let cantidadNumerosTabla = 50;
+        // if(rifaSeleccionada == 'rifa4'){
+        //     cantidadNumerosTabla = 50;
+        // }else{
+        //     cantidadNumerosTabla = 100;
+        // }
 
         // Iterar del 1 al 100 para mostrar todos los números
         for (let i = 1; i <= cantidadNumerosTabla; i++) {
@@ -165,7 +165,8 @@ async function guardarDatosEnGoogleSheet() {
     const spinner = document.getElementById("spinner");
     spinner.style.display = "flex";
 
-    fetch('https://script.google.com/macros/s/AKfycbwR5AcmwJjBz-dVfD6fHnQdVM4TOeL0G4Ynmf7Ty5DuAen7978af3CnY4H5DgmGZUA7/exec', {
+           
+    fetch('https://script.google.com/macros/s/AKfycbxtYGuoZSJkPDr2-H4EzUFgZ_kC_XcKi8rSCi6fx7lA1U2W-2XN21VH8l8Vg9hdGg0k/exec', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -205,4 +206,4 @@ async function guardarDatosEnGoogleSheet() {
 
 
 
-document.getElementById("descargarExcel").addEventListener("click", descargarExcel);
+// document.getElementById("descargarExcel").addEventListener("click", descargarExcel);
