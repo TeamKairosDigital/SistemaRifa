@@ -179,7 +179,7 @@ document.querySelectorAll('.copy-icon').forEach(icon => {
 
 
 
-simplyCountdown('#cuenta', {
+simplyCountdown('#cuentaRegresiva', {
     year: 2025, // required
     month: 5, // required
     day: 30, // required

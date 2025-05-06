@@ -162,7 +162,7 @@ body {
 
 
   /* ? ----- Cuenta Regresiva ----- */
-#cuenta {
+#cuentaRegresiva {
 	display: flex;
 	justify-content: center;
 	margin-bottom: 100px;
