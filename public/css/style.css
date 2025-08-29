@@ -55,11 +55,11 @@ body {
 
 
 .tarjeta-contenedor {
-    perspective: 1200px;
+    perspective: 1100px;
   }
 
   .tarjeta {
-    width: 350px;
+    width: 330px;
     height: 220px;
     border-radius: 20px;
     position: relative;
@@ -120,6 +120,7 @@ body {
     justify-content: space-between;
     margin: 4px 0;
     font-size: 14px;
+    text-align: left;
   }
 
   .dato-con-copia span {
@@ -140,7 +141,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
   }
 
@@ -189,4 +190,75 @@ body {
 	font-weight: 300;
 	font-size: 1.1rem;
 	color: #000000;
+}
+
+
+
+.linea-decorativa {
+  transform: translateX(60%);
+  align-items: right;
+  margin: 20px 0;
+}
+
+.linea-delgada {
+  height: 1px;
+  background-color: #ffffff;
+  width: 80px;
+  margin: 1px 10px;
+}
+
+.linea-gruesa {
+  height: 2px;
+  background-color: #ffffff;
+  width: 80px;
+  margin: 1px 10px;
+}
+
+
+.shadow-rifa-morado{
+  box-shadow: 8px 8px 0px 0px rgba(8,8,8,0.5);
+  -webkit-box-shadow: 8px 8px 0px 0px rgba(8,8,8,0.5);
+  -moz-box-shadow: 8px 8px 0px 0px rgba(8,8,8,0.5);
+}
+
+.rifa2-lineas-morado{
+  margin-top: 20px;
+}
+
+.text-collar{
+  font-size: 1rem;
+  color: #ffffff;
+  line-clamp: 1;
+  margin: 0;
+  padding-left: 25px;
+  text-align: left;
+}
+
+.text-aretes{
+  font-size: 1.8rem;
+  color: #ffffff;
+  font-weight: bold;
+  padding-left: 25px;
+  text-align: left;
+}
+
+.rifa2-precio{
+  margin: 0 auto;
+  text-align: center;
+}
+
+
+.precio-rifa2{
+  margin: 0;
+  padding: 0;
+}
+
+.text-pb{
+  padding: 0;
+  background-color: #ffffff;
+  color: #000000;
+  width: 60%;
+  text-align: center;
+  margin: 0 auto;
+  font-size: .7rem;
 }

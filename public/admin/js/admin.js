@@ -95,6 +95,27 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
             number.addEventListener("click", () => abrirModal(i));
             grid.appendChild(number);
         }
+        
+        actualizarResumen(cantidadNumeros);
+    }
+
+    function actualizarResumen(cantidadTotal) {
+        let boletosOcupados = 0;
+        
+        // Contar boletos ocupados
+        for (let i = 1; i <= cantidadTotal; i++) {
+            if (datos[i]?.ocupado) {
+                boletosOcupados++;
+            }
+        }
+        
+        const boletosDisponibles = cantidadTotal - boletosOcupados;
+        const totalRecaudado = boletosOcupados * 25; // $25 MXN por boleto
+        
+        // Actualizar el DOM
+        document.getElementById("boletosOcupados").textContent = boletosOcupados;
+        document.getElementById("boletosDisponibles").textContent = boletosDisponibles;
+        document.getElementById("totalRecaudado").textContent = totalRecaudado;
     }
 
     function abrirModal(numero) {
@@ -115,6 +136,10 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
         };
         document.querySelectorAll(".number")[numero - 1].classList.toggle("occupied", datos[numero].ocupado);
         bootstrap.Modal.getInstance(document.getElementById("numberModal")).hide();
+        
+        // Actualizar el resumen después de guardar un número
+        const cantidadNumeros = 50; // Mismo valor que en cargarRifa
+        actualizarResumen(cantidadNumeros);
     });
 
     async function guardarDatos() {

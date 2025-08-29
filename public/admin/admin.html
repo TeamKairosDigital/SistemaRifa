@@ -27,6 +27,34 @@
             </select>
         </div>
     </div>
+
+    <!-- Sección de Resumen -->
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-4 fs-4">Resumen de la Rifa</h5>
+                        <div class="d-flex flex-column gap-3">
+                            <p class="card-text mb-0 fs-5">
+                                <strong>Boletos Ocupados:</strong> 
+                                <span id="boletosOcupados" class="badge bg-primary ms-2 fs-6">0</span>
+                            </p>
+                            <p class="card-text mb-0 fs-5">
+                                <strong>Boletos Disponibles:</strong> 
+                                <span id="boletosDisponibles" class="badge bg-success ms-2 fs-6">0</span>
+                            </p>
+                            <p class="card-text mb-0 fs-5">
+                                <strong>Total Recaudado:</strong> 
+                                <span id="totalRecaudado" class="badge bg-info ms-2 fs-6">$0 MXN</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="grid" id="grid"></div>
     <button id="guardarBtn" class="btn btn-primary mt-3">Guardar Cambios</button>
 

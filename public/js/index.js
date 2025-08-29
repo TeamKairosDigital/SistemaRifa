@@ -91,9 +91,9 @@ function actualizarBotonEstado() {
 function textRifa(){
     switch (document.getElementById("rifaSelect").value) {
             case "rifa1":
-                return "Collar de acero inoxidable";
-            case "rifa2":
                 return "Perfume de caballero";
+            case "rifa2":
+                return "Collar de acero inoxidable";
             // case "rifa3":
             //     return "Diseño Gratis";
             // case "rifa4":
@@ -113,7 +113,7 @@ function enviarWhatsApp() {
 
     const mensaje = `Hola, soy ${nombre}.\n\nQuiero participar en la Rifa: ${rifaSeleccionada}.\n\n- Mi número de WhatsApp es: ${telefono}.\n\n- Mis números seleccionados son: ${numeros}\n\n- El total a pagar es de: $${total} pesos`;
 
-    const url = `https://wa.me/+529611983460?text=${encodeURIComponent(mensaje)}`;
+    const url = `https://wa.me/+529612321256?text=${encodeURIComponent(mensaje)}`;
     window.open(url, "_blank");
 }
 
@@ -183,8 +183,8 @@ simplyCountdown('#cuentaRegresiva', {
     year: 2025, // required
     month: 5, // required
     day: 30, // required
-    hours: 14, // Default is 0 [0-23] integer
-    minutes: 30, // Default is 0 [0-59] integer
+    hours: 20, // Default is 0 [0-23] integer
+    minutes: 0, // Default is 0 [0-59] integer
     seconds: 0, // Default is 0 [0-59] integer
     words: { //words displayed into the countdown
         days: { singular: 'Día', plural: 'Días' },

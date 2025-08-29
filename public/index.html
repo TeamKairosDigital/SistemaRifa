@@ -17,26 +17,66 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body>
 
-    <div class="w-100 w-md-50 w-lg-25">
+    <div class="w-100 w-md-50 w-lg-25 overflow-hidden">
+
+    <div class="text-center my-5">
+        <h2 class="text-center mt-5" data-aos="fade-up">🎉 ¡SÚPER RIFA! 🎉</h2>
+        <h2 class="text-center" data-aos="fade-up"> ¿Quieres ganar premios increíbles por solo $25 pesos</h2>
+        <h2 class="text-center" data-aos="fade-up">¡Esta es tu oportunidad! 🙌</h2>
+    </div>
 
         <div class="text-center d-lg-flex justify-content-center">
-            <div class="w-100 w-md-50 w-lg-25 mb-3 mb-lg-0">
+            <div class="w-100 w-md-50 w-lg-25 mb-3 mb-lg-0" data-aos="zoom-in-up">
                 <img src="img/Rifa_1.png" alt="Rifa_1"
                  class="w-100 mx-auto">
             </div>
-            <div class="w-100 w-md-50 w-lg-25">
+            <div class="w-100 w-md-50 w-lg-25" data-aos="zoom-in-down">
                 <img src="img/Rifa_2.png" alt="Rifa_2"
                 class="w-100 mx-auto">
             </div>
         </div>
+
+        <!-- IMAGNES CREADAS -->
+        <!-- <div class="container-fluid py-4 rifa2-grid-contenedor" style="height: 600px;">
+            <div class="row align-items-center justify-content-center" >
+                <div class="row">
+                    <div class="col-5" style="z-index: 1;">
+                        <h2 class="text-start mt-3">RIFA 2:</h2>
+                        <div class="rifa2-lineas position-absolute shadow-rifa-morado" style="width: 45%; height: 250px; background-color: #352A4D; transform: translate(0%, 20%);">
+
+                            <div class="linea-decorativa">
+                                <div class="linea-delgada"></div>
+                                <div class="linea-gruesa"></div>
+                                <div class="linea-delgada"></div>
+                            </div>
+
+                            <div class="rifa2-lineas-morado">
+                                <p class="text-collar">COLLAR Y</p>
+                                <p class="text-aretes">ARETES</p>
+                            </div>
+                            <div class="rifa2-precio mt-5">
+                                <p class="text-white precio-rifa2">$25</p>
+                                <p class="text-pb">POR BOLETO</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-7">
+                        <div class="position-absolute" style="width: 35%; height: 450px; background-color: #FFDE59; transform: translateX(10%);"></div>
+                        <img src="img/IMG_Rifa_2_Recorte.JPEG" alt="Rifa_2" class="mx-auto position-absolute" style="transform: translate(-55%, 30%); width: 55%;">
+                    </div>
+                </div>
+            </div>
+        </div> -->
         
         <h4 for="rifaSelect" class="mt-5">Selecciona una rifa:</h4>
     
         <div class="d-flex justify-content-center">
-            <div class="mx-3 w-75">
+            <div class="mx-3 w-75" data-aos="zoom-in">
                 <select class="form-select" id="rifaSelect" aria-label="Default select example">
                     <option value="rifa1">Rifa 1: Perfume de caballero</option>
                     <option value="rifa2">Rifa 2: Collar de acero inoxidable</option>
@@ -48,16 +88,16 @@
     
         <div style="margin: 1.2rem 8%;">
             <div class="text-start">
-                <h4>Reglas:</h4>
-                <p>1. Selecciona la cantidad de números que deseas comprar.</p>
-                <p>2. Ingresa tu nombre y tu número de WhatsApp.</p>
-                <p>3. Haz clic en "Adquirir boleto(s)" para enviar un mensaje de WhatsApp con los números seleccionados.</p>
-                <p><strong>Nota:</strong> Es importante que envíes el comprobante de pago en captura o foto; de lo contrario, tu participación no será válida.</p>
+                <h4 data-aos="fade-right" data-aos-delay="200">Reglas:</h4>
+                <p data-aos="fade-right" data-aos-delay="300">1. Selecciona la cantidad de números que deseas comprar.</p>
+                <p data-aos="fade-right" data-aos-delay="400">2. Ingresa tu nombre y tu número de WhatsApp.</p>
+                <p data-aos="fade-right" data-aos-delay="500">3. Haz clic en "Adquirir boleto(s)" para enviar un mensaje de WhatsApp con los números seleccionados.</p>
+                <p data-aos="fade-right" data-aos-delay="600"><strong>Nota:</strong> Es importante que envíes el comprobante de pago en captura o foto; de lo contrario, tu participación no será válida.</p>
             </div>
         </div>
 
-        <div class="tarjeta-contenedor">
-            <div class="tarjeta" id="tarjeta">
+        <div class="tarjeta-contenedor"  data-aos="zoom-in">
+            <div class="tarjeta" id="tarjeta" >
               <!-- Frente -->
               <div class="cara frente">
                 <div class="bbva">BBVA</div>
@@ -77,11 +117,11 @@
               <!-- Reverso -->
               <div class="cara reverso">
                 <div class="dato-con-copia">
-                  <span><strong>Cuenta:</strong> <span id="cuenta">153 557 0293</span></span>
+                  <span><strong>Cuenta:</strong><br><span id="cuenta">153 557 0293</span></span>
                   <i class="fa-regular fa-copy copy-icon" data-target="cuenta"></i>
                 </div>
                 <div class="dato-con-copia">
-                  <span><strong>Cuenta CLABE:</strong> <span id="clabe"> 012 180 01535570293 0</span></span>
+                  <span><strong>Cuenta CLABE:</strong><br> <span id="clabe"> 012 180 01535570293 0</span></span>
                   <i class="fa-regular fa-copy copy-icon" data-target="clabe"></i>
                 </div>
                 <div class="bbva">BBVA</div>
@@ -90,42 +130,54 @@
         </div>
     
         <div class="d-flex justify-content-center mx-4 my-5" >
-            <div class="d-flex align-items-center mx-2">
-                <div style="width: 20px; height: 20px; background-color: #06D6A0; border-radius: 3px;"></div>
+            <div class="d-flex align-items-center mx-1" data-aos="flip-up" data-aos-delay="300">
+                <div style="width: 17px; height: 17px; background-color: #06D6A0; border-radius: 3px;"></div>
                 <p class="mb-0 ms-2">Disponibles</p>
             </div>
-            <div class="d-flex align-items-center mx-2">
-                <div style="width: 20px; height: 20px; background-color: #ef476f; border-radius: 3px;"></div>
+            <div class="d-flex align-items-center mx-1" data-aos="flip-up" data-aos-delay="400">
+                <div style="width: 17px; height: 17px; background-color: #ef476f; border-radius: 3px;"></div>
                 <p class="mb-0 ms-2">Ocupados</p>
             </div>
-            <div class="d-flex align-items-center mx-2">
-                <div style="width: 20px; height: 20px; background-color: #073b4c; border-radius: 3px;"></div>
+            <div class="d-flex align-items-center mx-1" data-aos="flip-up" data-aos-delay="500">
+                <div style="width: 17px; height: 17px; background-color: #073b4c; border-radius: 3px;"></div>
                 <p class="mb-0 ms-2">Seleccionado(s)</p>
             </div>
         </div>
     
-        <div class="grid" id="grid"></div>
+        <div class="grid" id="grid" data-aos="zoom-in"></div>
     
         <!-- Inputs para Nombre y Número -->
-        <div class="container my-4">
-            <label for="nombre" class="form-label">Nombre Completo:</label>
-            <input type="text" id="nombre" class="form-control mb-2" placeholder="Juan Perez">
-            <label for="telefono" class="form-label">Número de Teléfono:</label>
-            <input type="text" id="telefono" class="form-control mb-2" placeholder="961 123 4567">
+        <div class="container my-5">
+            <div data-aos="zoom-out-up" data-aos-delay="300">
+                <label for="nombre" class="form-label">Nombre Completo:</label>
+                <input type="text" id="nombre" class="form-control mb-2" placeholder="Juan Perez">
+            </div>
+            <div data-aos="zoom-out-up" data-aos-delay="400">
+                <label for="telefono" class="form-label">Número de Teléfono:</label>
+                <input type="text" id="telefono" class="form-control mb-2" placeholder="961 123 4567">
+            </div>
         </div>
     
         <div class="contenedor my-5">
             <button type="button" class="btn btn-primary" id="enviarBtn" disabled>Adquirir boleto(s)</button>
         </div>
           
-        <div class="text-center">
+        <div class="text-center" data-aos="zoom-out-up" data-aos-delay="300">
             <div class="mb-5">
                 <h4>Fecha de la rifa:</h4>
-                <h2>30 de mayo de 2025</h2>
+                <h2>30 de mayo de 2025 a las 8:00 PM</h2>
+            </div>
+
+            <div class="text-center my-5" data-aos="zoom-out-up" data-aos-delay="400">
+                <h4>Ver transmisión en Facebook:</h4>
+                <p class="w-75 mx-auto">Ir al perfil de la rifa en el siguiente icono</p>
+                <a href="https://www.facebook.com/lupitaprinses.ramirezjimenez" target="_blank">
+                    <i class="fab fa-facebook-square display-3"></i>
+                </a>
             </div>
 
             <!-- Cuenta regresiva -->
-            <div class="text-center">
+            <div class="text-center" data-aos="zoom-out-up" data-aos-delay="400">
                 <h4>Faltan:</h4>
                 <div id="cuentaRegresiva"></div>
             </div>
@@ -139,6 +191,12 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
+
+    <!-- AOS -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
 
     <script src="js/simplyCountdown.min.js"></script>
     <script type="module" src="js/index.js">
