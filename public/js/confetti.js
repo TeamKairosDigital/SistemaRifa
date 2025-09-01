@@ -15,7 +15,7 @@ function executeConfetti() {
                     ticks: 200
                 });
                 
-                console.log('¡Confeti ejecutado exitosamente!');
+                // console.log('¡Confeti ejecutado exitosamente!');
             } else {
                 console.log('Confeti no está disponible');
             }
