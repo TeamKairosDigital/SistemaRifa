@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -575,7 +575,7 @@ async function eliminarParticipante() {
             // Eliminar el participante (dejar el número disponible)
             delete datosActuales[participanteEditando];
 
-            await updateDoc(docRef, datosActuales);
+            await setDoc(docRef, datosActuales);
 
             // Actualizar datos locales
             delete rifaData[rifaEditando][participanteEditando];

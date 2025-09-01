@@ -129,62 +129,48 @@ async function enviarWhatsApp() {
     try {
         // Guardar en Firebase
         await guardarEnFirebase(nombre, telefono, tipoPago, numeros);
-        
+
         // Ocultar spinner
         spinner.style.display = "none";
-        
-        // Enviar WhatsApp
-        const mensaje = `Hola, soy ${nombre}.\n\nQuiero participar en la Rifa: ${rifaTexto}.\n\n- Mi número de WhatsApp es: ${telefono}.\n\n- Mis números seleccionados son: ${numeros.join(", ")}\n\n- El total a pagar es de: $${total} pesos\n\n- Tipo de pago: ${tipoPago === 'transferencia' ? 'Transferencia Bancaria' : 'Efectivo'}\n\n- Estado: PENDIENTE DE PAGO`;
-        
+
+        // Preparar mensaje
+        const mensaje = `Hola, soy ${nombre}.\n\nQuiero participar en la Rifa: ${rifaTexto}.\n\n- Mi número de WhatsApp es: ${telefono}.\n\n- Mis números seleccionados son: ${numeros.join(", ")}\n\n- El total a pagar es de: $${total} pesos\n\n- Tipo de pago: ${tipoPago === 'transferencia' ? 'Transferencia Bancaria (Comprobante de pago PENDIENTE)' : 'Efectivo'}\n\n- Estado: PENDIENTE DE PAGO`;
+
         const url = `https://wa.me/+529613210411?text=${encodeURIComponent(mensaje)}`;
-        
-        // Pequeño retraso para mostrar que se procesó correctamente
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Intentar abrir WhatsApp de múltiples maneras
-        try {
-            // Método 1: window.open con parámetros optimizados
-            const whatsappWindow = window.open(url, "_blank", "noopener,noreferrer");
-            
-            // Verificar si se abrió correctamente
-            if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed == 'undefined') {
-                console.log('Pop-up bloqueado, redirigiendo directamente...');
-                // Método 2: Crear un enlace temporal y hacer clic
-                const tempLink = document.createElement('a');
-                tempLink.href = url;
-                tempLink.target = '_blank';
-                tempLink.rel = 'noopener noreferrer';
-                document.body.appendChild(tempLink);
-                tempLink.click();
-                document.body.removeChild(tempLink);
-                
-                // Método 3: Como último recurso, redirigir la página actual
-                setTimeout(() => {
-                    if (confirm('¿No se abrió WhatsApp? ¿Quieres ser redirigido a WhatsApp?')) {
-                        window.location.href = url;
-                    }
-                }, 1000);
-            } else {
-                console.log('WhatsApp abierto exitosamente');
-            }
-        } catch (error) {
-            console.log('Error al abrir WhatsApp, redirigiendo...');
-            window.location.href = url;
-        }
-        
-        // Limpiar selección y mostrar mensaje de éxito
-        limpiarSeleccion();
-        Swal.fire({
+
+        // Mostrar confirmación ANTES de abrir WhatsApp
+        await Swal.fire({
             icon: 'success',
             title: '¡Boletos reservados!',
-            text: 'Tus boletos han sido reservados. Envía el comprobante de pago por WhatsApp para confirmar tu participación.',
-            confirmButtonText: 'Entendido'
+            text: 'Tus boletos han sido reservados. Ahora se abrirá WhatsApp para que envíes tu comprobante.',
+            confirmButtonText: 'Continuar'
         });
-        
+
+        // Intentar abrir WhatsApp
+        try {
+            // Método más confiable en móviles (iOS/Android)
+            window.location.href = url;
+
+            // Como respaldo, usar window.open (ej. escritorio con pop-up permitido)
+            setTimeout(() => {
+                const w = window.open(url, "_blank", "noopener,noreferrer");
+                if (!w || w.closed || typeof w.closed === 'undefined') {
+                    console.log('Pop-up bloqueado, redirigiendo directamente...');
+                    window.location.href = url;
+                }
+            }, 500);
+        } catch (error) {
+            console.error('Error al abrir WhatsApp, redirigiendo...', error);
+            window.location.href = url;
+        }
+
+        // Limpiar selección
+        limpiarSeleccion();
+
     } catch (error) {
         // Ocultar spinner en caso de error
         spinner.style.display = "none";
-        
+
         console.error("Error al guardar en Firebase:", error);
         Swal.fire({
             icon: 'error',
@@ -194,6 +180,7 @@ async function enviarWhatsApp() {
         });
     }
 }
+
 
 async function guardarEnFirebase(nombre, telefono, tipoPago, numeros) {
     const docRef = doc(db, "rifas", rifaSeleccionada);
