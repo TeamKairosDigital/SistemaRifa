@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         agregarBotonLogout();
         
         setupEventListeners();
+        setupEditModalListeners();
         loadRifaData();
     } catch (error) {
         console.error('Usuario no autenticado:', error);
@@ -184,14 +185,22 @@ function displayRifaTable(rifa) {
             <td>${tipoPagoTexto}</td>
             <td>${estado}</td>
             <td>
-                ${nombre && telefono && !pago ? 
-                    `<button class="btn btn-sm btn-success" onclick="confirmarPago('${rifa}', ${i}, '${nombre}', '${tipoPago}')">
-                        <i class="fas fa-check"></i> Confirmar Pago
-                    </button>` : 
-                    (nombre && telefono && pago ? 
-                        '<span class="text-success"><i class="fas fa-check-circle"></i> Pago Confirmado</span>' : 
-                        '')
-                }
+                <div class="btn-group" role="group">
+                    ${nombre && telefono ? 
+                        `<button class="btn btn-sm btn-outline-primary" onclick="editarParticipante('${rifa}', ${i})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>` : 
+                        ''
+                    }
+                    ${nombre && telefono && !pago ? 
+                        `<button class="btn btn-sm btn-success" onclick="confirmarPago('${rifa}', ${i}, '${nombre}', '${tipoPago}')" title="Confirmar Pago">
+                            <i class="fas fa-check"></i>
+                        </button>` : 
+                        (nombre && telefono && pago ? 
+                            '<span class="text-success"><i class="fas fa-check-circle"></i></span>' : 
+                            '')
+                    }
+                </div>
             </td>
         `;
 
@@ -398,5 +407,208 @@ async function actualizarGoogleSheets() {
             text: 'No se pudo sincronizar con Google Sheets. Los datos locales se han guardado correctamente.',
             confirmButtonText: 'Entendido'
         });
+    }
+}
+
+// Variables globales para edición
+let participanteEditando = null;
+let rifaEditando = null;
+
+// Función global para editar participante
+window.editarParticipante = function(rifa, numero) {
+    const data = rifaData[rifa][numero];
+    if (!data) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se encontró el participante'
+        });
+        return;
+    }
+
+    // Guardar datos para edición
+    participanteEditando = numero;
+    rifaEditando = rifa;
+
+    // Llenar el formulario
+    document.getElementById('edit-numero').value = numero;
+    document.getElementById('edit-nombre').value = data.nombre || '';
+    document.getElementById('edit-telefono').value = data.numero || '';
+    document.getElementById('edit-tipo-pago').value = data.tipoPago || '';
+    document.getElementById('edit-estado-pago').value = data.pago ? 'true' : 'false';
+
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('editarParticipanteModal'));
+    modal.show();
+};
+
+// Event listeners para el modal de edición (se configuran cuando se carga el DOM)
+function setupEditModalListeners() {
+    // Botón guardar cambios
+    const guardarBtn = document.getElementById('guardarCambiosBtn');
+    if (guardarBtn) {
+        guardarBtn.addEventListener('click', guardarCambiosParticipante);
+    }
+    
+    // Botón eliminar participante
+    const eliminarBtn = document.getElementById('eliminarParticipanteBtn');
+    if (eliminarBtn) {
+        eliminarBtn.addEventListener('click', eliminarParticipante);
+    }
+}
+
+// Función para guardar cambios del participante
+async function guardarCambiosParticipante() {
+    if (!participanteEditando || !rifaEditando) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No hay participante seleccionado para editar'
+        });
+        return;
+    }
+
+    // Validar formulario
+    const nombre = document.getElementById('edit-nombre').value.trim();
+    const telefono = document.getElementById('edit-telefono').value.trim();
+    const tipoPago = document.getElementById('edit-tipo-pago').value;
+    const estadoPago = document.getElementById('edit-estado-pago').value === 'true';
+
+    if (!nombre || !telefono || !tipoPago) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos requeridos',
+            text: 'Por favor completa todos los campos'
+        });
+        return;
+    }
+
+    try {
+        mostrarSpinner();
+
+        const docRef = doc(db, "rifas", rifaEditando);
+        const docSnap = await getDoc(docRef);
+        let datosActuales = docSnap.exists() ? docSnap.data() : {};
+
+        // Actualizar datos del participante
+        datosActuales[participanteEditando] = {
+            ...datosActuales[participanteEditando],
+            nombre: nombre,
+            numero: telefono,
+            tipoPago: tipoPago,
+            pago: estadoPago,
+            ocupado: estadoPago, // Si está pagado, está ocupado
+            fechaModificacion: new Date().toISOString()
+        };
+
+        await updateDoc(docRef, datosActuales);
+
+        // Actualizar datos locales
+        rifaData[rifaEditando][participanteEditando] = datosActuales[participanteEditando];
+
+        // Actualizar tabla
+        displayRifaTable(rifaEditando);
+
+        // Actualizar Google Sheets
+        await actualizarGoogleSheets();
+
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editarParticipanteModal'));
+        modal.hide();
+
+        ocultarSpinner();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Participante Actualizado',
+            text: 'Los datos del participante se han actualizado correctamente',
+            timer: 2000,
+            showConfirmButton: false
+        });
+
+    } catch (error) {
+        console.error("Error al actualizar participante:", error);
+        ocultarSpinner();
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo actualizar el participante'
+        });
+    }
+}
+
+// Función para eliminar participante
+async function eliminarParticipante() {
+    if (!participanteEditando || !rifaEditando) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No hay participante seleccionado para eliminar'
+        });
+        return;
+    }
+
+    const data = rifaData[rifaEditando][participanteEditando];
+    const nombre = data.nombre || 'Participante';
+
+    // Confirmar eliminación
+    const result = await Swal.fire({
+        title: '¿Eliminar participante?',
+        text: `¿Estás seguro de que quieres eliminar a ${nombre} del número ${participanteEditando}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            mostrarSpinner();
+
+            const docRef = doc(db, "rifas", rifaEditando);
+            const docSnap = await getDoc(docRef);
+            let datosActuales = docSnap.exists() ? docSnap.data() : {};
+
+            // Eliminar el participante (dejar el número disponible)
+            delete datosActuales[participanteEditando];
+
+            await updateDoc(docRef, datosActuales);
+
+            // Actualizar datos locales
+            delete rifaData[rifaEditando][participanteEditando];
+
+            // Actualizar tabla
+            displayRifaTable(rifaEditando);
+
+            // Actualizar Google Sheets
+            await actualizarGoogleSheets();
+
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editarParticipanteModal'));
+            modal.hide();
+
+            ocultarSpinner();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Participante Eliminado',
+                text: 'El participante ha sido eliminado correctamente',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+        } catch (error) {
+            console.error("Error al eliminar participante:", error);
+            ocultarSpinner();
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo eliminar el participante'
+            });
+        }
     }
 }

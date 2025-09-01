@@ -268,6 +268,56 @@
         </div>
     </div>
 
+    <!-- Modal para editar participante -->
+    <div class="modal fade" id="editarParticipanteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Participante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editarParticipanteForm">
+                        <div class="mb-3">
+                            <label for="edit-numero" class="form-label">Número de Boleto</label>
+                            <input type="text" class="form-control" id="edit-numero" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="edit-nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-telefono" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="edit-telefono" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-tipo-pago" class="form-label">Tipo de Pago</label>
+                            <select class="form-select" id="edit-tipo-pago" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="transferencia">Transferencia Bancaria</option>
+                                <option value="efectivo">Efectivo</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-estado-pago" class="form-label">Estado del Pago</label>
+                            <select class="form-select" id="edit-estado-pago" required>
+                                <option value="false">Pendiente</option>
+                                <option value="true">Pagado</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger me-auto" id="eliminarParticipanteBtn">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="guardarCambiosBtn">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Spinner que cubre toda la pantalla -->
     <div class="spinner-container" id="spinner" style="display: none;">
         <div class="spinner-border" role="status">

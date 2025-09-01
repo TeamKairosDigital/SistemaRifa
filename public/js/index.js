@@ -143,13 +143,29 @@ async function enviarWhatsApp() {
         
         // Intentar abrir WhatsApp de múltiples maneras
         try {
-            // Método 1: window.open
-            const whatsappWindow = window.open(url, "_blank");
+            // Método 1: window.open con parámetros optimizados
+            const whatsappWindow = window.open(url, "_blank", "noopener,noreferrer");
             
-            // Método 2: Si falla, usar location.href
+            // Verificar si se abrió correctamente
             if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed == 'undefined') {
                 console.log('Pop-up bloqueado, redirigiendo directamente...');
-                window.location.href = url;
+                // Método 2: Crear un enlace temporal y hacer clic
+                const tempLink = document.createElement('a');
+                tempLink.href = url;
+                tempLink.target = '_blank';
+                tempLink.rel = 'noopener noreferrer';
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+                
+                // Método 3: Como último recurso, redirigir la página actual
+                setTimeout(() => {
+                    if (confirm('¿No se abrió WhatsApp? ¿Quieres ser redirigido a WhatsApp?')) {
+                        window.location.href = url;
+                    }
+                }, 1000);
+            } else {
+                console.log('WhatsApp abierto exitosamente');
             }
         } catch (error) {
             console.log('Error al abrir WhatsApp, redirigiendo...');
