@@ -1,278 +1,402 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
 
+const firebaseConfig = {
+    apiKey: "AIzaSyBb9UPKIqoTTB68H2J-JXozbWzu1kUOlS8",
+    authDomain: "rifa-con-causa-tayson.firebaseapp.com",
+    projectId: "rifa-con-causa-tayson",
+    storageBucket: "rifa-con-causa-tayson.firebasestorage.app",
+    messagingSenderId: "331195222003",
+    appId: "1:331195222003:web:29849ab31d10a8b089b486",
+    measurementId: "G-12KRHS7D3M"
+};
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBb9UPKIqoTTB68H2J-JXozbWzu1kUOlS8",
-        authDomain: "rifa-con-causa-tayson.firebaseapp.com",
-        projectId: "rifa-con-causa-tayson",
-        storageBucket: "rifa-con-causa-tayson.firebasestorage.app",
-        messagingSenderId: "331195222003",
-        appId: "1:331195222003:web:29849ab31d10a8b089b486",
-        measurementId: "G-12KRHS7D3M"
-    };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-    // Inicializar Firebase y módulos
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    let datos = {};
+let currentRifa = 'rifa1';
+let rifaData = {};
 
-    // Verificar si el usuario está autenticado
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-        window.location.href = "index.html"; // Redirige al login si no está logueado
-        } else {
-        // console.log("Usuario logueado:", user.email);
-        }
+// Elementos del DOM
+const rifaTabs = document.querySelectorAll('[id$="-tab"]');
+const rifaContents = document.querySelectorAll('.rifa-content');
+const refreshBtn = document.getElementById('refreshBtn');
+
+// Verificación de autenticación
+function verificarAutenticacion() {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
+            if (user) {
+                resolve(user);
+            } else {
+                reject(new Error('No autenticado'));
+            }
+        });
     });
-    
-    // Cerrar sesión
-    function logout() {
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Verificar autenticación antes de cargar el panel
+        await verificarAutenticacion();
+        
+        // Agregar botón de logout al header
+        agregarBotonLogout();
+        
+        setupEventListeners();
+        loadRifaData();
+    } catch (error) {
+        console.error('Usuario no autenticado:', error);
+        // Redirigir al login si no está autenticado
+        window.location.href = 'index.html';
+    }
+});
+
+function agregarBotonLogout() {
+    const header = document.querySelector('.d-flex.justify-content-between');
+    if (header) {
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'btn btn-outline-danger btn-sm ms-2';
+        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar Sesión';
+        logoutBtn.onclick = async () => {
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+            }
+        };
+        
+        const btnGroup = header.querySelector('.btn-group');
+        if (btnGroup) {
+            btnGroup.appendChild(logoutBtn);
+        }
+    }
+}
+
+function setupEventListeners() {
+    // Tabs de navegación
+    rifaTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetRifa = tab.id.replace('-tab', '');
+            showRifaContent(targetRifa);
+        });
+    });
+
+    // Botón de actualizar
+    refreshBtn.addEventListener('click', loadRifaData);
+}
+
+function showRifaContent(rifa) {
+    // Actualizar tabs activos
+    rifaTabs.forEach(tab => tab.classList.remove('active'));
+    document.getElementById(`${rifa}-tab`).classList.add('active');
+
+    // Mostrar contenido correspondiente
+    rifaContents.forEach(content => content.style.display = 'none');
+    document.getElementById(`${rifa}-content`).style.display = 'block';
+
+    currentRifa = rifa;
+    if (rifa === 'resumen') {
+        loadResumenData();
+    } else {
+        displayRifaTable(rifa);
+    }
+}
+
+async function loadRifaData() {
+    try {
+        const rifas = ['rifa1', 'rifa2', 'rifa3'];
+        
+        for (const rifa of rifas) {
+            const docRef = doc(db, "rifas", rifa);
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                rifaData[rifa] = docSnap.data();
+            } else {
+                rifaData[rifa] = {};
+            }
+        }
+
+        // Mostrar datos de la rifa actual
+        if (currentRifa === 'resumen') {
+            loadResumenData();
+        } else {
+            displayRifaTable(currentRifa);
+        }
 
         Swal.fire({
-            title: "¿Estás seguro?",
-            text: "Desea cerrar sesión?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Si, cerrar sesión!"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              signOut(auth)
-              .then(() => {
-                  window.location.href = "index.html";
-              })
-              .catch((error) => {
-                  console.error("Error al cerrar sesión:", error);
-              });
-            }
-          });
-
-
-    }
-
-    // Puedes exponer logout al HTML si usas <button onclick="logout()">Cerrar sesión</button>
-    window.logout = logout;
-
-    document.addEventListener('DOMContentLoaded', async () => {
-        document.getElementById("rifaSelect").addEventListener("change", cargarRifa);
-        document.getElementById("guardarBtn").addEventListener("click", async () => {
-            await guardarDatos();
-            await generarTablaRifa(); // Se actualiza la tabla después de guardar
+            icon: 'success',
+            title: 'Datos actualizados',
+            text: 'La información se ha actualizado correctamente',
+            timer: 1500,
+            showConfirmButton: false
         });
-        // Llamar a la función cuando se cambie de rifa
-        document.getElementById("rifaSelect").addEventListener("change", generarTablaRifa);
 
-        // Cargar automáticamente la rifa 1 al inicio
-        document.getElementById("rifaSelect").value = "rifa1";
-        await cargarRifa();
-        await generarTablaRifa();
-    });
-
-    async function cargarRifa() {
-        const rifaSeleccionada = document.getElementById("rifaSelect").value;
-        const grid = document.getElementById("grid");
-        grid.innerHTML = "";
-        const docRef = doc(db, "rifas", rifaSeleccionada);
-        const docSnap = await getDoc(docRef);
-        datos = docSnap.exists() ? docSnap.data() : {};
-
-        let cantidadNumeros = 50;
-            // if(rifaSeleccionada == 'rifa4'){
-            //     cantidadNumeros = 50;
-            // }else{
-            //     cantidadNumeros = 100;
-            // }
-        
-        for (let i = 1; i <= cantidadNumeros; i++) {
-            const number = document.createElement("div");
-            number.classList.add("number");
-            number.textContent = i;
-            if (datos[i]?.ocupado) number.classList.add("occupied");
-            number.addEventListener("click", () => abrirModal(i));
-            grid.appendChild(number);
-        }
-        
-        actualizarResumen(cantidadNumeros);
+    } catch (error) {
+        console.error("Error al cargar datos:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron cargar los datos'
+        });
     }
+}
 
-    function actualizarResumen(cantidadTotal) {
-        let boletosOcupados = 0;
-        
-        // Contar boletos ocupados
-        for (let i = 1; i <= cantidadTotal; i++) {
-            if (datos[i]?.ocupado) {
-                boletosOcupados++;
+function displayRifaTable(rifa) {
+    const tableBody = document.getElementById(`${rifa}-table`);
+    tableBody.innerHTML = '';
+
+    for (let i = 1; i <= 80; i++) {
+        const row = document.createElement('tr');
+        const data = rifaData[rifa][i] || {};
+
+        const nombre = data.nombre || '';
+        const telefono = data.numero || '';
+        const tipoPago = data.tipoPago || '';
+        const pago = data.pago || false;
+        const ocupado = data.ocupado || false;
+
+        let estado = '';
+        if (nombre && telefono) {
+            if (pago) {
+                estado = '<span class="badge bg-success">Pagado</span>';
+            } else {
+                estado = '<span class="badge bg-warning">Pendiente</span>';
+            }
+        } else {
+            estado = '<span class="badge bg-secondary">Disponible</span>';
+        }
+
+        let tipoPagoTexto = tipoPago ? 
+            (tipoPago === 'transferencia' ? 'Transferencia' : 'Efectivo') : '';
+
+        row.innerHTML = `
+            <td>${i}</td>
+            <td>${nombre}</td>
+            <td>${telefono}</td>
+            <td>${tipoPagoTexto}</td>
+            <td>${estado}</td>
+            <td>
+                ${nombre && telefono && !pago ? 
+                    `<button class="btn btn-sm btn-success" onclick="confirmarPago('${rifa}', ${i}, '${nombre}', '${tipoPago}')">
+                        <i class="fas fa-check"></i> Confirmar Pago
+                    </button>` : 
+                    (nombre && telefono && pago ? 
+                        '<span class="text-success"><i class="fas fa-check-circle"></i> Pago Confirmado</span>' : 
+                        '')
+                }
+            </td>
+        `;
+
+        // Aplicar colores según el estado
+        if (nombre && telefono) {
+            if (pago) {
+                row.classList.add('table-success');
+            } else {
+                row.classList.add('table-warning');
             }
         }
-        
-        const boletosDisponibles = cantidadTotal - boletosOcupados;
-        const totalRecaudado = boletosOcupados * 25; // $25 MXN por boleto
-        
-        // Actualizar el DOM
-        document.getElementById("boletosOcupados").textContent = boletosOcupados;
-        document.getElementById("boletosDisponibles").textContent = boletosDisponibles;
-        document.getElementById("totalRecaudado").textContent = totalRecaudado;
-    }
 
-    function abrirModal(numero) {
-        document.getElementById("modalNumber").value = numero;
-        document.getElementById("numeroEditado").innerText = numero;
-        document.getElementById("nombre").value = datos[numero]?.nombre || "";
-        document.getElementById("telefono").value = datos[numero]?.numero || "";
-        document.getElementById("ocupado").checked = datos[numero]?.ocupado || false;
-        new bootstrap.Modal(document.getElementById("numberModal")).show();
+        tableBody.appendChild(row);
     }
+}
 
-    document.getElementById("guardarNumero").addEventListener("click", () => {
-        const numero = document.getElementById("modalNumber").value;
-        datos[numero] = {
-            ocupado: document.getElementById("ocupado").checked,
-            nombre: document.getElementById("nombre").value,
-            numero: document.getElementById("telefono").value
-        };
-        document.querySelectorAll(".number")[numero - 1].classList.toggle("occupied", datos[numero].ocupado);
-        bootstrap.Modal.getInstance(document.getElementById("numberModal")).hide();
-        
-        // Actualizar el resumen después de guardar un número
-        const cantidadNumeros = 50; // Mismo valor que en cargarRifa
-        actualizarResumen(cantidadNumeros);
+function loadResumenData() {
+    const rifas = ['rifa1', 'rifa2', 'rifa3'];
+    let totalTransferencias = 0;
+    let totalEfectivo = 0;
+    let transferenciasData = [];
+    let efectivoData = [];
+
+    rifas.forEach(rifa => {
+        let rifaTransferencias = 0;
+        let rifaEfectivo = 0;
+
+        // Procesar datos de la rifa
+        Object.keys(rifaData[rifa]).forEach(numero => {
+            const data = rifaData[rifa][numero];
+            if (data.nombre && data.numero && data.pago) {
+                const monto = 50; // $50 por boleto
+                
+                if (data.tipoPago === 'transferencia') {
+                    rifaTransferencias += monto;
+                    totalTransferencias += monto;
+                    transferenciasData.push({
+                        rifa: getRifaNombre(rifa),
+                        nombre: data.nombre,
+                        numeros: numero,
+                        monto: monto
+                    });
+                } else if (data.tipoPago === 'efectivo') {
+                    rifaEfectivo += monto;
+                    totalEfectivo += monto;
+                    efectivoData.push({
+                        rifa: getRifaNombre(rifa),
+                        nombre: data.nombre,
+                        numeros: numero,
+                        monto: monto
+                    });
+                }
+            }
+        });
+
+        // Actualizar resumen por rifa
+        document.getElementById(`${rifa}-transferencias`).textContent = `$${rifaTransferencias}`;
+        document.getElementById(`${rifa}-efectivo`).textContent = `$${rifaEfectivo}`;
+        document.getElementById(`${rifa}-total`).textContent = `$${rifaTransferencias + rifaEfectivo}`;
     });
 
-    async function guardarDatos() {
+    // Actualizar totales generales
+    document.getElementById('total-transferencias').textContent = `$${totalTransferencias}`;
+    document.getElementById('total-efectivo').textContent = `$${totalEfectivo}`;
 
-        const rifaSeleccionada = document.getElementById("rifaSelect").value;
-        await setDoc(doc(db, "rifas", rifaSeleccionada), datos); // Guardar los datos en Firestore
-        // alert("Datos guardados correctamente.");
-        guardarDatosEnGoogleSheet(); // Guardar los datos en Google Sheets
-    }
+    // Actualizar tablas de participantes
+    updateParticipantesTable('transferencias-table', transferenciasData);
+    updateParticipantesTable('efectivo-table', efectivoData);
+}
 
-    // Función para generar la tabla de la rifa seleccionada
-    async function generarTablaRifa() {
-        const rifaSeleccionada = document.getElementById("rifaSelect").value;
-        const tablaContainer = document.getElementById("tablaContainer");
-        tablaContainer.innerHTML = ""; // Limpiar contenido previo
+function updateParticipantesTable(tableId, data) {
+    const tableBody = document.getElementById(tableId);
+    tableBody.innerHTML = '';
 
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.rifa}</td>
+            <td>${item.nombre}</td>
+            <td>${item.numeros}</td>
+            <td>$${item.monto}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function getRifaNombre(rifa) {
+    const nombres = {
+        'rifa1': 'Carnitas',
+        'rifa2': 'Pastel',
+        'rifa3': 'Fotos'
+    };
+    return nombres[rifa] || rifa;
+}
+
+// Función global para confirmar pago
+window.confirmarPago = async function(rifa, numero, nombre, tipoPago) {
+    // Mostrar modal de confirmación
+    document.getElementById('modal-nombre').textContent = nombre;
+    document.getElementById('modal-numeros').textContent = numero;
+    document.getElementById('modal-tipo-pago').textContent = tipoPago === 'transferencia' ? 'Transferencia Bancaria' : 'Efectivo';
+
+    const modal = new bootstrap.Modal(document.getElementById('confirmarPagoModal'));
+    modal.show();
+
+    // Configurar botón de confirmación
+    document.getElementById('confirmarPagoBtn').onclick = async () => {
         try {
-            const docRef = doc(db, "rifas", rifaSeleccionada);
-            const docSnap = await getDoc(docRef);
-
-            if (!docSnap.exists()) {
-                console.error("No se encontró la rifa seleccionada:", rifaSeleccionada);
-                return;
-            }
-
-            datos = docSnap.data();
-            // console.log("Datos de la rifa seleccionada:", datos);
-            // Crear la tabla de Bootstrap
-            let tableHTML = `
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Número</th>
-                            <th>Nombre</th>
-                            <th>Teléfono</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            let cantidadNumerosTabla = 50;
-            // if(rifaSeleccionada == 'rifa4'){
-            //     cantidadNumerosTabla = 50;
-            // }else{
-            //     cantidadNumerosTabla = 100;
-            // }
-
-            // Iterar del 1 al 100 para mostrar todos los números
-            for (let i = 1; i <= cantidadNumerosTabla; i++) {
-                let ocupado = datos[i]?.ocupado || false;
-                let nombre = datos[i]?.nombre || "";
-                let telefono = datos[i]?.numero || "";
-
-                tableHTML += `
-                    <tr style="background-color: ${ocupado ? "#c6efce" : "transparent"};">
-                        <td>${i}</td>
-                        <td>${ocupado ? nombre : ""}</td>
-                        <td>${ocupado ? telefono : ""}</td>
-                    </tr>
-                `;
-            }
-
-            tableHTML += `</tbody></table>`;
-            tablaContainer.innerHTML = tableHTML;
-        } catch (error) {
-            console.error("Error al generar la tabla:", error);
-        }
-    }
-
-    function descargarExcel() {
-        let tabla = document.querySelector("table");
-        if (!tabla) {
-            alert("No hay datos para exportar.");
-            return;
-        }
-        let wb = XLSX.utils.book_new();
-        let ws = XLSX.utils.table_to_sheet(tabla);
-        XLSX.utils.book_append_sheet(wb, ws, "Rifa");
-        XLSX.writeFile(wb, "rifa.xlsx");
-    }
-
-
-    async function guardarDatosEnGoogleSheet() {
-        // https://script.google.com/macros/s/AKfycbwR5AcmwJjBz-dVfD6fHnQdVM4TOeL0G4Ynmf7Ty5DuAen7978af3CnY4H5DgmGZUA7/exec
-
-        // https://script.google.com/macros/s/AKfycbzx-awptCc6TEFik9xzs45II1KQyjH4QmVVRQSb7iAzCrAmPsCREwAhy7UoZAvFlBs/exec
-        // Mostrar spinner mientras carga
-        const spinner = document.getElementById("spinner");
-        spinner.style.display = "flex";
-
+            // Mostrar spinner
+            mostrarSpinner();
             
-        fetch('https://script.google.com/macros/s/AKfycbxtYGuoZSJkPDr2-H4EzUFgZ_kC_XcKi8rSCi6fx7lA1U2W-2XN21VH8l8Vg9hdGg0k/exec', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({}),
-            mode: 'no-cors', // Evita el error de CORS
-        })
-        .then(response => {
-            // console.log('Estado de la respuesta:', response);
-            // if (response.ok) {
-            //     return response.text(); // Obtener la respuesta como texto
-            // }
-            // throw new Error('Error en la respuesta del servidor: ' + response.statusText);
-            spinner.style.display = "none"; // Ocultar spinner
+            const docRef = doc(db, "rifas", rifa);
+            const docSnap = await getDoc(docRef);
+            let datosActuales = docSnap.exists() ? docSnap.data() : {};
+
+            // Actualizar estado de pago
+            if (datosActuales[numero]) {
+                datosActuales[numero].pago = true;
+                datosActuales[numero].ocupado = true;
+                datosActuales[numero].fechaPago = new Date().toISOString();
+
+                await updateDoc(docRef, datosActuales);
+
+                // Actualizar datos locales
+                rifaData[rifa][numero] = datosActuales[numero];
+
+                // Actualizar tabla
+                displayRifaTable(rifa);
+
+                // Actualizar Google Sheets
+                await actualizarGoogleSheets();
+
+                modal.hide();
+
+                // Ocultar spinner
+                ocultarSpinner();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pago Confirmado',
+                    text: `El pago de ${nombre} ha sido confirmado exitosamente`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+            } else {
+                throw new Error('No se encontró el registro');
+            }
+
+        } catch (error) {
+            console.error("Error al confirmar pago:", error);
+            
+            // Ocultar spinner en caso de error
+            ocultarSpinner();
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo confirmar el pago'
+            });
+        }
+    };
+};
+
+// Funciones helper para el spinner
+function mostrarSpinner() {
+    document.getElementById('spinner').style.display = 'flex';
+}
+
+function ocultarSpinner() {
+    document.getElementById('spinner').style.display = 'none';
+}
+
+// Función para actualizar Google Sheets
+async function actualizarGoogleSheets() {
+    try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxeVwGT4i51ThlV0b6NHyOrdFG69lrVLyC11amxDUBeFavIJLKLUImQVoTg-DjRr06x/exec', {
+            method: 'GET'
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Google Sheets actualizado:', data);
+            
+            // Mostrar mensaje de éxito
             Swal.fire({
                 icon: 'success',
-                title: 'Datos guardados.',
-                text: `Datos guardados correctamente`,
+                title: 'Google Sheets Actualizado',
+                text: 'Los datos se han sincronizado correctamente con Google Sheets',
                 timer: 2000,
                 showConfirmButton: false
-              });
-        })
-        // .then(text => {
-        //     console.log('Respuesta recibida:', text);
-        //     try {
-        //         const result = JSON.parse(text); // Intentar parsear la respuesta a JSON
-        //         console.log(result.message);
-        //         if (result.message === "Datos guardados correctamente") {
-        //             alert("Los datos han sido guardados correctamente.");
-        //         }
-        //     } catch (e) {
-        //         console.error('Error al parsear JSON:', e);
-        //         alert('Hubo un error al procesar la respuesta del servidor.');
-        //     }
-        //     spinner.style.display = "none"; // Ocultar spinner
-        // })
-        // .catch(error => {
-        //     console.error('Error al guardar los datos:', error);
-        //     spinner.style.display = "none";
-        // });
+            });
+        } else {
+            console.error('Error al actualizar Google Sheets:', response.status);
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error al actualizar Google Sheets:', error);
+        
+        // Mostrar mensaje de error más informativo
+        Swal.fire({
+            icon: 'warning',
+            title: 'Error de Sincronización',
+            text: 'No se pudo sincronizar con Google Sheets. Los datos locales se han guardado correctamente.',
+            confirmButtonText: 'Entendido'
+        });
     }
-
-
-// document.getElementById("descargarExcel").addEventListener("click", descargarExcel);
+}

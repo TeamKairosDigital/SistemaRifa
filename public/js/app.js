@@ -23,7 +23,7 @@ let datos = {};
 // Función para cargar datos de Firebase
 // Función para cargar los datos de Firebase
 async function cargarDatos() {
-    const docRef = doc(db, "rifas", "rifa1"); // Ajustar según la rifa seleccionada
+    const docRef = doc(db, "rifas", "rifa1","rifa3"); // Ajustar según la rifa seleccionada
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
         datos = docSnap.data();
@@ -104,8 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarDatos(); // Llamar a cargar los datos de Firebase
 
     // Asociar los botones a la función seleccionarRifa
-    document.getElementById("btnRifa1").addEventListener("click", () => seleccionarRifa(1, 'Collar de acero inoxidable'));
-    document.getElementById("btnRifa2").addEventListener("click", () => seleccionarRifa(2, 'Perfume de caballero'));
-    // document.getElementById("btnRifa3").addEventListener("click", () => seleccionarRifa(3, 'Diseño gratis'));
+    document.getElementById("btnRifa1").addEventListener("click", () => seleccionarRifa(1, 'Carnitas estilos Michoacán'));
+    document.getElementById("btnRifa2").addEventListener("click", () => seleccionarRifa(2, 'Pastel para 30 personas'));
+    document.getElementById("btnRifa3").addEventListener("click", () => seleccionarRifa(3, 'Toma de fotos'));
     
 });

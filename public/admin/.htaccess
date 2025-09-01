@@ -1,0 +1,36 @@
+# Protección de acceso directo al panel de administración
+RewriteEngine On
+
+# Redirigir a index.html si se accede directamente a admin.html
+RewriteCond %{HTTP_REFERER} ^$
+RewriteRule ^admin\.html$ index.html [R=302,L]
+
+# Redirigir a index.html si se accede desde un dominio externo
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?raffle-system\.web\.app [NC]
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?localhost [NC]
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?127\.0\.0\.1 [NC]
+RewriteRule ^admin\.html$ index.html [R=302,L]
+
+# Prevenir acceso directo a archivos JavaScript y CSS desde fuera del dominio
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?raffle-system\.web\.app [NC]
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?localhost [NC]
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?127\.0\.0\.1 [NC]
+RewriteRule \.(js|css)$ index.html [R=302,L]
+
+# Protección adicional: bloquear acceso directo a archivos sensibles
+<Files "admin.js">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "firebase-init.js">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Permitir acceso solo desde el mismo dominio
+<Files "admin.html">
+    Order Allow,Deny
+    Allow from all
+    Require all granted
+</Files>

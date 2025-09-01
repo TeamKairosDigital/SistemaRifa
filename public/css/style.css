@@ -25,6 +25,11 @@ body {
     cursor: auto; 
 }
 
+.pending { 
+    background-color: #ffd23f; 
+    cursor: auto; 
+}
+
 .selected { 
     background-color: #073b4c; 
 }
@@ -44,12 +49,26 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.8); /* Fondo semitransparente */
+    background-color: rgba(255, 255, 255, 0.9); /* Fondo más opaco */
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 9999; /* Asegura que el spinner esté por encima del contenido */
     display: none; /* Ocultamos el spinner por defecto */
+}
+
+.spinner-container .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: #007bff;
+}
+
+.spinner-container .spinner-text {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 500;
 }
 
 
@@ -163,7 +182,7 @@ body {
 
 
   /* ? ----- Cuenta Regresiva ----- */
-#cuentaRegresiva {
+#cuentaRegresiva, #cuentaRegresiva2 {
 	display: flex;
 	justify-content: center;
 	margin-bottom: 100px;

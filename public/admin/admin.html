@@ -5,112 +5,279 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administración de Rifas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="../css/style.css">
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" id="rifa1-tab">
+                                <i class="fas fa-ticket-alt"></i> Rifa 1: Carnitas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="rifa2-tab">
+                                <i class="fas fa-birthday-cake"></i> Rifa 2: Pastel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="rifa3-tab">
+                                <i class="fas fa-camera"></i> Rifa 3: Fotos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="resumen-tab">
+                                <i class="fas fa-chart-bar"></i> Resumen General
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-    <div class="my-5">
-        <button class="btn btn-secondary" type="submit" onclick="logout()">Cerrar sesión</button>
-    </div>
-
-    <h1 class="mt-5">Administración de Rifas</h1>
-    <div class="d-flex justify-content-center">
-        <div class="mx-4 w-100">
-            <select class="form-select" id="rifaSelect">
-                <option value="rifa1">Rifa 1: Perfume de caballero</option>
-                <option value="rifa2">Rifa 2: Collar de acero inoxidable</option>
-                <!-- <option value="rifa3">Rifa 3: Diseño Gratis</option>
-                <option value="rifa4">Rifa 4: Cena para 2 personas</option> -->
-            </select>
-        </div>
-    </div>
-
-    <!-- Sección de Resumen -->
-    <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm">
-                    <div class="card-body text-center">
-                        <h5 class="card-title mb-4 fs-4">Resumen de la Rifa</h5>
-                        <div class="d-flex flex-column gap-3">
-                            <p class="card-text mb-0 fs-5">
-                                <strong>Boletos Ocupados:</strong> 
-                                <span id="boletosOcupados" class="badge bg-primary ms-2 fs-6">0</span>
-                            </p>
-                            <p class="card-text mb-0 fs-5">
-                                <strong>Boletos Disponibles:</strong> 
-                                <span id="boletosDisponibles" class="badge bg-success ms-2 fs-6">0</span>
-                            </p>
-                            <p class="card-text mb-0 fs-5">
-                                <strong>Total Recaudado:</strong> 
-                                <span id="totalRecaudado" class="badge bg-info ms-2 fs-6">$0 MXN</span>
-                            </p>
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Panel de Administración</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshBtn">
+                                <i class="fas fa-sync-alt"></i> Actualizar
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- Rifa 1 Content -->
+                <div id="rifa1-content" class="rifa-content">
+                    <h3>Rifa 1: Carnitas estilos Michoacán</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Nombre</th>
+                                    <th>Teléfono</th>
+                                    <th>Tipo de Pago</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rifa1-table">
+                                <!-- Datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Rifa 2 Content -->
+                <div id="rifa2-content" class="rifa-content" style="display: none;">
+                    <h3>Rifa 2: Pastel para 30 personas</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Nombre</th>
+                                    <th>Teléfono</th>
+                                    <th>Tipo de Pago</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rifa2-table">
+                                <!-- Datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Rifa 3 Content -->
+                <div id="rifa3-content" class="rifa-content" style="display: none;">
+                    <h3>Rifa 3: Toma de fotos</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Nombre</th>
+                                    <th>Teléfono</th>
+                                    <th>Tipo de Pago</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rifa3-table">
+                                <!-- Datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Resumen General Content -->
+                <div id="resumen-content" class="rifa-content" style="display: none;">
+                    <h3>Resumen General de Pagos</h3>
+                    
+                    <!-- Resumen por Rifa -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Rifa 1: Carnitas</h5>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Transferencias:</strong></p>
+                                            <p class="text-success" id="rifa1-transferencias">$0</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Efectivo:</strong></p>
+                                            <p class="text-info" id="rifa1-efectivo">$0</p>
+                                        </div>
+                                    </div>
+                                    <p class="mb-0"><strong>Total:</strong> <span id="rifa1-total">$0</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Rifa 2: Pastel</h5>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Transferencias:</strong></p>
+                                            <p class="text-success" id="rifa2-transferencias">$0</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Efectivo:</strong></p>
+                                            <p class="text-info" id="rifa2-efectivo">$0</p>
+                                        </div>
+                                    </div>
+                                    <p class="mb-0"><strong>Total:</strong> <span id="rifa2-total">$0</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Rifa 3: Fotos</h5>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Transferencias:</strong></p>
+                                            <p class="text-success" id="rifa3-transferencias">$0</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Efectivo:</strong></p>
+                                            <p class="text-info" id="rifa3-efectivo">$0</p>
+                                        </div>
+                                    </div>
+                                    <p class="mb-0"><strong>Total:</strong> <span id="rifa3-total">$0</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen Total -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Transferencias</h5>
+                                    <h3 id="total-transferencias">$0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Efectivo</h5>
+                                    <h3 id="total-efectivo">$0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Participantes por Tipo de Pago -->
+                    <div class="mt-4">
+                        <h4>Participantes por Tipo de Pago</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Transferencias Bancarias</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Rifa</th>
+                                                <th>Nombre</th>
+                                                <th>Números</th>
+                                                <th>Monto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="transferencias-table">
+                                            <!-- Datos se cargarán dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Pagos en Efectivo</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Rifa</th>
+                                                <th>Nombre</th>
+                                                <th>Números</th>
+                                                <th>Monto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="efectivo-table">
+                                            <!-- Datos se cargarán dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 
-    <div class="grid" id="grid"></div>
-    <button id="guardarBtn" class="btn btn-primary mt-3">Guardar Cambios</button>
-
-    <div class="container mt-4">
-        <h2>Detalle de Rifas</h2>
-        <a class="btn btn-success my-4" data-toggle="collapse" target="_blank" href="https://docs.google.com/spreadsheets/d/1aDn1PTCFD2WjdQXFPh8VJOo8e3udNhDyUKpgQ2qAS_Q/edit?usp=sharing" role="button" aria-expanded="false" aria-controls="collapseExample">
-            Ver Google Sheets
-          </a>
-        <div id="tablaContainer"></div>
-    </div>
-    
-    <!-- Modal -->
-    <div class="modal fade" id="numberModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <!-- Modal para confirmar pago -->
+    <div class="modal fade" id="confirmarPagoModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="modalLabel">Editar Número</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Confirmar Pago</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-
-                    <p>Estás editando el número <span id="numeroEditado"></span></p>
-
-                    <input type="hidden" id="modalNumber">
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre:</label>
-                        <input type="text" id="nombre" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label">Número de Teléfono:</label>
-                        <input type="text" id="telefono" class="form-control">
-                    </div>
-                    <div class="form-check d-flex align-items-center justify-content-center">
-                        <input class="form-check-input me-2" type="checkbox" id="ocupado">
-                        <label class="form-check-label" for="ocupado">Ocupado</label>
-                    </div>
+                    <p>¿Confirmar que el pago ha sido realizado para <strong id="modal-nombre"></strong>?</p>
+                    <p><strong>Números:</strong> <span id="modal-numeros"></span></p>
+                    <p><strong>Tipo de Pago:</strong> <span id="modal-tipo-pago"></span></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="guardarNumero">Guardar</button>
+                    <button type="button" class="btn btn-success" id="confirmarPagoBtn">Confirmar Pago</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Spinner que cubre toda la pantalla -->
-    <div class="spinner-container" id="spinner">
+    <div class="spinner-container" id="spinner" style="display: none;">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
+        <div class="spinner-text">Procesando tu solicitud...</div>
     </div>
-    
-    <script src="./js/firebase-init.js" type="module"></script>
-    <script type="module" src="./js/admin.js">
-        
-    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="js/admin.js"></script>
 </body>
 </html>

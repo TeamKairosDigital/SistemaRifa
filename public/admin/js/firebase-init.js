@@ -21,7 +21,13 @@ window.login = async function () {
     const password = document.getElementById("password").value;
   
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Establecer token de sesión
+      const sessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('admin_session_token', sessionToken);
+      
+      // Redirigir al panel de administración
       window.location.href = "admin.html";
     } catch (error) {
       Swal.fire({
