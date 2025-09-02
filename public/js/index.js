@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBb9UPKIqoTTB68H2J-JXozbWzu1kUOlS8",
@@ -195,6 +195,7 @@ async function guardarEnFirebase(nombre, telefono, tipoPago, numeros) {
             nombre: nombre,
             numero: telefono,
             tipoPago: tipoPago,
+            // fechaReserva: fechaActualFormateada(),
             ocupado: false, // No está ocupado hasta que se confirme el pago
             pago: false,    // Pendiente de pago
             fechaReserva: new Date().toISOString()
@@ -207,6 +208,11 @@ async function guardarEnFirebase(nombre, telefono, tipoPago, numeros) {
     // Ejecutar script de Google Sheets
     await ejecutarScriptGoogleSheets();
 }
+
+function fechaActualFormateada() {
+    const ahora = new Date();
+    return ahora.toLocaleString("es-MX", { timeZone: "America/Mexico_City" });
+  }
 
 async function ejecutarScriptGoogleSheets() {
     try {

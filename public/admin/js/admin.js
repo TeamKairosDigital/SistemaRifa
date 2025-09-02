@@ -91,6 +91,74 @@ function setupEventListeners() {
 
     // Botón de actualizar
     refreshBtn.addEventListener('click', loadRifaData);
+    
+    // Botón de sidebar móvil
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+    }
+    
+    // Event listeners para filtros de rifas
+    setupFilterListeners();
+    
+    // Event listeners para filtros del resumen
+    setupResumenFilterListeners();
+}
+
+// Función para alternar sidebar en móviles
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('show');
+}
+
+// Configurar event listeners para filtros de rifas
+function setupFilterListeners() {
+    const rifas = ['rifa1', 'rifa2', 'rifa3'];
+    
+    rifas.forEach(rifa => {
+        // Filtro por estado
+        const estadoFilter = document.getElementById(`${rifa}-estado-filter`);
+        if (estadoFilter) {
+            estadoFilter.addEventListener('change', () => applyTableFilters(rifa));
+        }
+        
+        // Filtro por tipo de pago
+        const pagoFilter = document.getElementById(`${rifa}-pago-filter`);
+        if (pagoFilter) {
+            pagoFilter.addEventListener('change', () => applyTableFilters(rifa));
+        }
+        
+        // Filtro de búsqueda
+        const searchFilter = document.getElementById(`${rifa}-search`);
+        if (searchFilter) {
+            searchFilter.addEventListener('input', () => applyTableFilters(rifa));
+        }
+    });
+}
+
+// Configurar event listeners para filtros del resumen
+function setupResumenFilterListeners() {
+    // Filtros de transferencias
+    const transferenciasSearch = document.getElementById('transferencias-search');
+    const transferenciasRifa = document.getElementById('transferencias-rifa-filter');
+    
+    if (transferenciasSearch) {
+        transferenciasSearch.addEventListener('input', applyResumenFilters);
+    }
+    if (transferenciasRifa) {
+        transferenciasRifa.addEventListener('change', applyResumenFilters);
+    }
+    
+    // Filtros de efectivo
+    const efectivoSearch = document.getElementById('efectivo-search');
+    const efectivoRifa = document.getElementById('efectivo-rifa-filter');
+    
+    if (efectivoSearch) {
+        efectivoSearch.addEventListener('input', applyResumenFilters);
+    }
+    if (efectivoRifa) {
+        efectivoRifa.addEventListener('change', applyResumenFilters);
+    }
 }
 
 function showRifaContent(rifa) {
@@ -154,6 +222,10 @@ function displayRifaTable(rifa) {
     const tableBody = document.getElementById(`${rifa}-table`);
     tableBody.innerHTML = '';
 
+    let totalParticipantes = 0;
+    let totalPendientes = 0;
+    let totalPagados = 0;
+
     for (let i = 1; i <= 80; i++) {
         const row = document.createElement('tr');
         const data = rifaData[rifa][i] || {};
@@ -163,6 +235,17 @@ function displayRifaTable(rifa) {
         const tipoPago = data.tipoPago || '';
         const pago = data.pago || false;
         const ocupado = data.ocupado || false;
+        const fechaReserva = formatDate(data.fechaReserva) || '';
+
+        // Contar estadísticas
+        if (nombre && telefono) {
+            totalParticipantes++;
+            if (pago) {
+                totalPagados++;
+            } else {
+                totalPendientes++;
+            }
+        }
 
         let estado = '';
         if (nombre && telefono) {
@@ -183,6 +266,7 @@ function displayRifaTable(rifa) {
             <td>${nombre}</td>
             <td>${telefono}</td>
             <td>${tipoPagoTexto}</td>
+            <td>${fechaReserva}</td>
             <td>${estado}</td>
             <td>
                 <div class="btn-group" role="group">
@@ -215,12 +299,29 @@ function displayRifaTable(rifa) {
 
         tableBody.appendChild(row);
     }
+
+    // Actualizar contadores
+    updateRifaCounters(rifa, totalParticipantes, totalPendientes, totalPagados);
+}
+
+function formatDate(date) {
+    if (!date) return ''; // si es null, undefined o vacío
+
+    const fecha = new Date(date);
+    if (isNaN(fecha.getTime())) return ''; // si no es una fecha válida
+
+    return fecha.toLocaleString("es-MX", {
+        dateStyle: "short",
+        timeStyle: "short",
+        timeZone: "America/Mexico_City"
+    });
 }
 
 function loadResumenData() {
     const rifas = ['rifa1', 'rifa2', 'rifa3'];
     let totalTransferencias = 0;
     let totalEfectivo = 0;
+    let totalPendientes = 0;
     let transferenciasData = [];
     let efectivoData = [];
 
@@ -231,27 +332,32 @@ function loadResumenData() {
         // Procesar datos de la rifa
         Object.keys(rifaData[rifa]).forEach(numero => {
             const data = rifaData[rifa][numero];
-            if (data.nombre && data.numero && data.pago) {
-                const monto = 50; // $50 por boleto
-                
-                if (data.tipoPago === 'transferencia') {
-                    rifaTransferencias += monto;
-                    totalTransferencias += monto;
-                    transferenciasData.push({
-                        rifa: getRifaNombre(rifa),
-                        nombre: data.nombre,
-                        numeros: numero,
-                        monto: monto
-                    });
-                } else if (data.tipoPago === 'efectivo') {
-                    rifaEfectivo += monto;
-                    totalEfectivo += monto;
-                    efectivoData.push({
-                        rifa: getRifaNombre(rifa),
-                        nombre: data.nombre,
-                        numeros: numero,
-                        monto: monto
-                    });
+            if (data.nombre && data.numero) {
+                if (data.pago) {
+                    const monto = 50; // $50 por boleto
+                    
+                    if (data.tipoPago === 'transferencia') {
+                        rifaTransferencias += monto;
+                        totalTransferencias += monto;
+                        transferenciasData.push({
+                            rifa: getRifaNombre(rifa),
+                            nombre: data.nombre,
+                            numeros: numero,
+                            monto: monto
+                        });
+                    } else if (data.tipoPago === 'efectivo') {
+                        rifaEfectivo += monto;
+                        totalEfectivo += monto;
+                        efectivoData.push({
+                            rifa: getRifaNombre(rifa),
+                            nombre: data.nombre,
+                            numeros: numero,
+                            monto: monto
+                        });
+                    }
+                } else {
+                    // Contar pendientes
+                    totalPendientes++;
                 }
             }
         });
@@ -265,6 +371,7 @@ function loadResumenData() {
     // Actualizar totales generales
     document.getElementById('total-transferencias').textContent = `$${totalTransferencias}`;
     document.getElementById('total-efectivo').textContent = `$${totalEfectivo}`;
+    document.getElementById('total-pendientes').textContent = totalPendientes;
 
     // Actualizar tablas de participantes
     updateParticipantesTable('transferencias-table', transferenciasData);
@@ -454,6 +561,117 @@ function setupEditModalListeners() {
     const eliminarBtn = document.getElementById('eliminarParticipanteBtn');
     if (eliminarBtn) {
         eliminarBtn.addEventListener('click', eliminarParticipante);
+    }
+}
+
+// Función para actualizar contadores de rifa
+function updateRifaCounters(rifa, total, pendientes, pagados) {
+    const totalElement = document.getElementById(`${rifa}-total-participantes`);
+    const pendientesElement = document.getElementById(`${rifa}-pendientes`);
+    const pagadosElement = document.getElementById(`${rifa}-pagados`);
+    
+    if (totalElement) totalElement.textContent = total;
+    if (pendientesElement) pendientesElement.textContent = pendientes;
+    if (pagadosElement) pagadosElement.textContent = pagados;
+}
+
+// Función para aplicar filtros a una tabla
+function applyTableFilters(rifa) {
+    const estadoFilter = document.getElementById(`${rifa}-estado-filter`).value;
+    const pagoFilter = document.getElementById(`${rifa}-pago-filter`).value;
+    const searchFilter = document.getElementById(`${rifa}-search`).value.toLowerCase();
+    
+    const tableBody = document.getElementById(`${rifa}-table`);
+    const rows = tableBody.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const nombre = row.cells[1].textContent.toLowerCase();
+        const telefono = row.cells[2].textContent.toLowerCase();
+        const tipoPago = row.cells[3].textContent.toLowerCase();
+        const estado = row.cells[4].textContent.toLowerCase();
+        
+        let showRow = true;
+        
+        // Filtro por estado
+        if (estadoFilter) {
+            if (estadoFilter === 'disponible' && !nombre) {
+                showRow = true;
+            } else if (estadoFilter === 'pendiente' && estado.includes('pendiente')) {
+                showRow = true;
+            } else if (estadoFilter === 'pagado' && estado.includes('pagado')) {
+                showRow = true;
+            } else if (estadoFilter !== 'disponible') {
+                showRow = false;
+            }
+        }
+        
+        // Filtro por tipo de pago
+        if (pagoFilter && tipoPago && tipoPago !== pagoFilter.toLowerCase()) {
+            showRow = false;
+        }
+        
+        // Filtro de búsqueda
+        if (searchFilter && !nombre.includes(searchFilter) && !telefono.includes(searchFilter)) {
+            showRow = false;
+        }
+        
+        row.style.display = showRow ? '' : 'none';
+    });
+}
+
+// Función para aplicar filtros a las tablas del resumen
+function applyResumenFilters() {
+    const transferenciasSearch = document.getElementById('transferencias-search').value.toLowerCase();
+    const transferenciasRifa = document.getElementById('transferencias-rifa-filter').value;
+    const efectivoSearch = document.getElementById('efectivo-search').value.toLowerCase();
+    const efectivoRifa = document.getElementById('efectivo-rifa-filter').value;
+    
+    // Aplicar filtros a tabla de transferencias
+    const transferenciasTable = document.getElementById('transferencias-table');
+    if (transferenciasTable) {
+        const rows = transferenciasTable.querySelectorAll('tr');
+        rows.forEach(row => {
+            const rifa = row.cells[0].textContent;
+            const nombre = row.cells[1].textContent.toLowerCase();
+            const numeros = row.cells[2].textContent;
+            const monto = row.cells[3].textContent;
+            
+            let showRow = true;
+            
+            if (transferenciasRifa && rifa !== transferenciasRifa) {
+                showRow = false;
+            }
+            
+            if (transferenciasSearch && !nombre.includes(transferenciasSearch) && !numeros.includes(transferenciasSearch)) {
+                showRow = false;
+            }
+            
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+    
+    // Aplicar filtros a tabla de efectivo
+    const efectivoTable = document.getElementById('efectivo-table');
+    if (efectivoTable) {
+        const rows = efectivoTable.querySelectorAll('tr');
+        rows.forEach(row => {
+            const rifa = row.cells[0].textContent;
+            const nombre = row.cells[1].textContent.toLowerCase();
+            const numeros = row.cells[2].textContent;
+            const monto = row.cells[3].textContent;
+            
+            let showRow = true;
+            
+            if (efectivoRifa && rifa !== efectivoRifa) {
+                showRow = false;
+            }
+            
+            if (efectivoSearch && !nombre.includes(efectivoSearch) && !numeros.includes(efectivoSearch)) {
+                showRow = false;
+            }
+            
+            row.style.display = showRow ? '' : 'none';
+        });
     }
 }
 
